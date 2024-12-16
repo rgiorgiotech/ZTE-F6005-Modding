@@ -36,7 +36,7 @@ Ho quindi proceduto ad utilizzare diversi tool da riga di comando, tra cui:
 
 ### Risultati iniziali con Binwalk
 
-I primi interessanti risultati ottenuti con binwalk sul dump completo permettono di capire la struttura, più o meno comune a tutti gli ONT analizzati, della NAND:
+I primi interessanti risultati ottenuti con binwalk sul dump completo permettono di capire la struttura, più o meno comune a tutti gli ONT analizzati, della SPI NOR flash:
 - **0x404**: Copyright text “Copyright 2008, Cambridge Industry Group(CIG), All Rights Reserved.”
 - **0x16410 (ZTE)** o **0x16470 (Nokia)**: uImage firmware image, di circa 93KB, che contiene il bootloader (U-Boot) compresso in lzma e compilato per architettura MIPS32, load address ed entry point 0x81C00000, nome “U-Boot 2011.12.NA-svn145404 for ]”.
 - **0x80000**: Settori di configurazione, filesystem JFFS2, big endian, dimensione di circa 1.6MB.
@@ -115,7 +115,7 @@ Risolti i due problemi, ho reinserito i due CramFS (si sta sempre parlando di qu
 
 Flashato tutto e acceso l’ONT… **Funziona!** Le spie LOS e LAN si accendono. Provo subito a collegarmi via Telnet (`telnet 192.168.1.1`) e… **funziona anche questo!** Le credenziali però non sono admin/admin come nel caso della web GUI, ma root/admin: anche in questo caso sono andato a tentativi.
 
-Purtroppo, non funziona né SSH né la porta seriale. Per quanto riguarda il primo, credo che la causa sia da ricercare nelle regole di iptables oppure nel daemon dropbear non configurato o non presente nel firmware ZTE; sulla seconda, credo che il problema risieda nel kernel, che blocca la porta a monte ancor prima di eventuali regole dell’OS.
+Purtroppo, non funziona né SSH né la porta seriale. Per quanto riguarda SSH, credo che la causa sia da ricercare nelle regole di iptables oppure nel daemon dropbear non configurato o non presente nel firmware ZTE; sulla porta seriale, credo che il problema risieda nel kernel, che blocca la porta a monte ancor prima di eventuali regole dell’OS.
 
 ---
 
@@ -123,7 +123,7 @@ Purtroppo, non funziona né SSH né la porta seriale. Per quanto riguarda il pri
 
 È interessante notare che, alla fine, se spiegassi a qualcuno come agire senza raccontare tutto ciò che ho fatto prima, risulterebbe una procedura tutto sommato semplice (a patto di avere le giuste conoscenze e competenze preliminari) e breve da applicare. Tuttavia, “l’essenza” sta piuttosto in tutto ciò che ho fatto per arrivare alla conclusione.
 
-Ritengo corretto specificare che l’unica funzione sbloccata risulterà il Telnet e quindi, come già scritto, SSH e porta seriale rimarranno bloccate. Inoltre, il bootloader non avrà intenzione di dialogare tramite porta seriale perché anch’esso la blocca.  
+Come già scritto, l’unica funzione sbloccata risulterà il Telnet e quindi SSH e porta seriale rimarranno bloccate. Inoltre, il bootloader non avrà intenzione di dialogare tramite porta seriale perché anch’esso la blocca.  
 Nonostante ciò, il Telnet è tutto ciò di cui si potrebbe aver bisogno per far autenticare l’ONT, poiché da lì è possibile impartire qualsiasi comando che si impartirebbe via SSH o via porta seriale (a OS caricato).
 
 Un bootloader sbloccato permetterebbe di fare parecchie cose interessanti, tra cui:
@@ -133,4 +133,4 @@ Un bootloader sbloccato permetterebbe di fare parecchie cose interessanti, tra c
 
 Tuttavia, per chi vuole semplicemente modificare i parametri per la propria connessione, il Telnet è più che sufficiente.
 
-In futuro proverò a lavorare sul kernel dello ZTE e sul bootloader, per trovare eventuali regole che attualmente bloccano la porta seriale. Proverò a capire inoltre come abilitare la porta SSH lato OS.
+In futuro proverò a lavorare sul kernel dello ZTE e sul bootloader, per trovare eventuali regole che attualmente bloccano la porta seriale. Proverò a capire inoltre come abilitare SSH lato OS.
